@@ -8,9 +8,7 @@
 
 ## Buffer vs Stream
 1. 利用 Java NIO 中的 channel 和 byteBuffer —— ByteBufferClient
+2. byteBuffer 大小合适影响最终性能 —— ByteBufferClient4
 
 ## 内存拷贝
 1. 使用 ByteBuffer.duplicate 创建一份引用而不是拷贝 —— ByteBufferClient3
-
-
-ByteBufferClient2 ???

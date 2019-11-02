@@ -47,17 +47,15 @@ public class ByteBufferClient {
 
     private static void ensure (int len, ByteChannel chan) throws IOException
     {
-        if (buf.position() > buf.capacity () - len) {
+        if (buf.remaining () < len) {
             buf.compact ();
             buf.flip ();
-        }
-        while (buf.remaining () < len) {
-            int oldpos = buf.position ();
-            buf.position (buf.limit ());
-            buf.limit (buf.capacity ());
-            chan.read (buf);
-            buf.limit (buf.position ());
-            buf.position (oldpos);
+            do {
+                buf.position (buf.limit ());
+                buf.limit (buf.capacity ());
+                chan.read (buf);
+                buf.flip ();
+            } while (buf.remaining () < len);
         }
     }
 }

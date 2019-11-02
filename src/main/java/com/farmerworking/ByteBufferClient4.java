@@ -7,18 +7,19 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.SocketChannel;
 
-public class ByteBufferClient2 {
-    private static ByteBuffer buf = ByteBuffer.allocateDirect (1024*512);
+public class ByteBufferClient4 {
+    private static ByteBuffer buf;
 
     public static void main (String [] args) throws Exception
     {
+        buf = ByteBuffer.allocateDirect (128 * Integer.valueOf(args[1]));
         String hostName = args [0];
         final SocketAddress socketAddr = new InetSocketAddress(hostName, 22222);
         SocketChannel chan = SocketChannel.open ();
         chan.connect (socketAddr);
 
         byte[] type = new byte [4];
-        byte[] msg = new byte [1024];
+        ByteBuffer msgBuf = buf.duplicate();
         buf.limit (0);
 
         while (true) {
@@ -31,8 +32,10 @@ public class ByteBufferClient2 {
                 ensure (4, chan);
                 int len = buf.getInt ();
                 ensure (len, chan);
-                buf.get (msg, 0, len);
-                processMessage (type, msg, len);
+                msgBuf.limit (buf.position () + len);
+                msgBuf.position (buf.position ());
+                buf.position (buf.position () + len);
+                processMessage (type, msgBuf, len);
                 sum += len + 8;
             }
             long t1 = System.currentTimeMillis ();
@@ -42,7 +45,7 @@ public class ByteBufferClient2 {
         }
     }
 
-    private static void processMessage(byte[] type, byte[] msg, int len) {
+    private static void processMessage(byte[] type, ByteBuffer msg, int len) {
     }
 
     private static void ensure (int len, ByteChannel chan) throws IOException
